@@ -1,11 +1,14 @@
 import { useState } from "react"
 import { gql } from "@apollo/client"
 import { useMutation } from "@apollo/client/react"
+import { useQuery } from "@apollo/client/react"
 import { CREATE_BOOK, ALL_AUTHORS, ALL_BOOKS, EDIT_AUTHOR } from "../queries"
 
-const AuthorForm = () => {
+const AuthorForm = (props) => {
   const [name, setName] = useState("")
   const [born, setBorn] = useState("")
+
+  const authors = props.authors
 
   const [changeBorn] = useMutation(EDIT_AUTHOR)
 
@@ -24,11 +27,14 @@ const AuthorForm = () => {
 
       <form onSubmit={submit}>
         <div>
-          name{" "}
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
+          name{""}
+          <select value={name} onChange={({ target }) => setName(target.value)}>
+            {authors.map((a) => (
+              <option value={a.name} key={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           born{" "}
