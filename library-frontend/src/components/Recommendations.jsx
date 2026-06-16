@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client/react"
 import { useState } from "react"
 
 const Recommendations = (props) => {
