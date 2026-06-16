@@ -1,10 +1,11 @@
 import { useApolloClient, useQuery } from "@apollo/client/react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Authors from "./components/Authors"
 import Books from "./components/Books"
 import NewBook from "./components/NewBook"
 import LoginForm from "./components/LoginForm"
 import Recommendations from "./components/Recommendations"
+import Notification from "./components/Notification"
 import { gql } from "@apollo/client"
 import { ALL_AUTHORS, ALL_BOOKS, CURRENT_USER } from "./queries"
 
@@ -17,10 +18,23 @@ const App = () => {
   const result_user = useQuery(CURRENT_USER)
   const client = useApolloClient()
 
+  useEffect(() => {
+    if (token) {
+      result_user.refetch()
+    }
+  }, [token])
+
   const onLogout = () => {
     setToken(null)
     localStorage.clear()
     client.resetStore()
+  }
+
+  const showError = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
   }
 
   if (result_user.loading) {
@@ -36,6 +50,7 @@ const App = () => {
   if (!token) {
     return (
       <div>
+        <Notification errorMessage={errorMessage} />
         <div>
           <button onClick={() => setPage("authors")}>authors</button>
           <button onClick={() => setPage("books")}>books</button>
@@ -48,13 +63,20 @@ const App = () => {
 
         <Books show={page === "books"} books={result_books.data.allBooks} />
 
-        <LoginForm show={page === "login"} setToken={setToken} />
+        <LoginForm
+          show={page === "login"}
+          setToken={setToken}
+          setError={showError}
+          setPage={setPage}
+          client={client}
+        />
       </div>
     )
   }
 
   return (
     <div>
+      <Notification errorMessage={errorMessage} />
       <div>
         <button onClick={() => setPage("authors")}>authors</button>
         <button onClick={() => setPage("books")}>books</button>
@@ -71,7 +93,7 @@ const App = () => {
 
       <Books show={page === "books"} books={result_books.data.allBooks} />
 
-      <NewBook show={page === "add"} />
+      <NewBook show={page === "add"} setPage={setPage} />
 
       <Recommendations
         show={page === "recommend"}

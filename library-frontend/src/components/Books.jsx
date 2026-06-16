@@ -5,17 +5,8 @@ import { ALL_BOOKS, GENRE_BOOKS } from "../queries"
 const Books = (props) => {
   const [genre, setGenre] = useState(null)
 
-  const result_genre = useQuery(GENRE_BOOKS, {
-    variables: {
-      genre: genre,
-    },
-    update: (cache, response) => {
-      cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
-        return {
-          allBooks: allBooks.concat(response.data.addBook),
-        }
-      })
-    },
+  const result_genre = useQuery(genre ? GENRE_BOOKS : ALL_BOOKS, {
+    variables: genre ? { genre } : {},
   })
   if (!props.show) {
     return null
@@ -32,7 +23,7 @@ const Books = (props) => {
   return (
     <div>
       <h2>books</h2>
-
+      <div>in genre {genre}</div>
       <table>
         <tbody>
           <tr>
@@ -55,6 +46,7 @@ const Books = (props) => {
             {genre}
           </button>
         ))}
+        <button onClick={() => setGenre(null)}>all genres</button>
       </div>
     </div>
   )

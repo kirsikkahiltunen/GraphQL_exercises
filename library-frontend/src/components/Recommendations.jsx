@@ -1,22 +1,28 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useQuery } from "@apollo/client/react"
+import { ALL_BOOKS, GENRE_BOOKS } from "../queries"
 
 const Recommendations = (props) => {
+  const [genre, setGenre] = useState(null)
+  useEffect(() => {
+    if (props.user?.favoriteGenre) {
+      setGenre(props.user.favoriteGenre)
+    }
+  }, [props.user])
   if (!props.show) {
     return null
   }
-
   const books = props.books
+  const filteredBooks = books.filter((b) => b.genres.includes(genre))
 
-  const genres = [...new Set(books.flatMap((b) => b.genres))]
-
-  const filteredBooks = books.filter((b) =>
-    b.genres.includes(props.user.favoriteGenre),
-  )
+  const genres = [...new Set(props.books.flatMap((b) => b.genres))]
 
   return (
     <div>
-      <h2>Recommendations</h2>
-      <div>books in your favorite genre: {props.user.favoriteGenre}</div>
+      <h2>recommendations</h2>
+      <div>
+        books in your favorite genre <strong>{props.user.favoriteGenre}</strong>
+      </div>
       <table>
         <tbody>
           <tr>
