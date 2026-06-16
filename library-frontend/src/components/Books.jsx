@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useQuery } from "@apollo/client/react"
-import { GENRE_BOOKS } from "../queries"
+import { ALL_BOOKS, GENRE_BOOKS } from "../queries"
 
 const Books = (props) => {
   const [genre, setGenre] = useState(null)
@@ -8,6 +8,13 @@ const Books = (props) => {
   const result_genre = useQuery(GENRE_BOOKS, {
     variables: {
       genre: genre,
+    },
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
+        return {
+          allBooks: allBooks.concat(response.data.addBook),
+        }
+      })
     },
   })
   if (!props.show) {
@@ -43,9 +50,9 @@ const Books = (props) => {
         </tbody>
       </table>
       <div>
-        {genres.map((g) => (
-          <button onClick={() => setGenre(g)} key={g}>
-            {g}
+        {genres.map((genre) => (
+          <button onClick={() => setGenre(genre)} key={genre}>
+            {genre}
           </button>
         ))}
       </div>
