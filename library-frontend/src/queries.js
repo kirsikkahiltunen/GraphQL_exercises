@@ -25,6 +25,14 @@ export const CREATE_BOOK = gql`
     }
   }
 `
+export const CURRENT_USER = gql`
+  query {
+    me {
+      username
+      favoriteGenre
+    }
+  }
+`
 
 export const ALL_AUTHORS = gql`
   query {
