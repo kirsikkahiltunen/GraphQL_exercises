@@ -24,23 +24,37 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => {
-      try {
-        let author = await Author.findOne({ name: args.author })
-        if (!author) {
-          author = new Author({ name: args.author })
+      let author = await Author.findOne({ name: args.author })
+      if (!author) {
+        author = new Author({ name: args.author })
+        try {
           await author.save()
+        } catch (error) {
+          if (error.name === "ValidationError") {
+            throw new GraphQLError(`Adding author failed: ${error.message}`, {
+              extensions: {
+                code: "GRAPHQL_VALIDATION_FAILED",
+                invalidArgs: args.author,
+                error,
+              },
+            })
+          }
         }
-        const book = new Book({ ...args, author: author._id })
+      }
+      const book = new Book({ ...args, author: author._id })
+      try {
         await book.save()
         return await book.populate("author")
       } catch (error) {
-        throw new GraphQLError(`Adding book failed: ${error.message}`, {
-          extensions: {
-            code: "BAD_USER_INPUT",
-            invalidArgs: args,
-            error,
-          },
-        })
+        if (error.name === "ValidationError") {
+          throw new GraphQLError(`Adding book failed: ${error.message}`, {
+            extensions: {
+              code: "GRAPHQL_VALIDATION_FAILED",
+              invalidArgs: args.title,
+              error,
+            },
+          })
+        }
       }
     },
     editAuthor: async (root, args) => {
