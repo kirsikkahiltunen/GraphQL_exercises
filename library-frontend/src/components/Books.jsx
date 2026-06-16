@@ -1,9 +1,17 @@
+import { useState } from "react"
+
 const Books = (props) => {
   if (!props.show) {
     return null
   }
 
+  const [genre, setGenre] = useState("all")
   const books = props.books
+
+  const genres = [...new Set(books.flatMap((b) => b.genres))]
+
+  const filteredBooks =
+    genre === "all" ? books : books.filter((b) => b.genres.includes(genre))
 
   return (
     <div>
@@ -16,7 +24,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
+          {filteredBooks.map((a) => (
             <tr key={a.id}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
@@ -25,6 +33,17 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
+      <div>
+        {genres.map((genre) => (
+          <button
+            value={genre}
+            onClick={({ target }) => setGenre(target.value)}
+            key={genre}
+          >
+            {genre}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
