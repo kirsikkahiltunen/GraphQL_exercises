@@ -1,4 +1,6 @@
+require("dotenv").config()
 const { GraphQLError } = require("graphql/error")
+const SECRET = process.env.SECRET || "test_secret"
 const jwt = require("jsonwebtoken")
 const Book = require("./models/book")
 const Author = require("./models/author")
@@ -53,6 +55,16 @@ const resolvers = {
           }
         }
       }
+      const titleExists = await Book.exists({ title: args.title })
+
+      if (titleExists) {
+        throw new GraphQLError("Title must be unique: ${args.title}", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.title,
+          },
+        })
+      }
       const book = new Book({ ...args, author: author._id })
       try {
         await book.save()
@@ -88,7 +100,10 @@ const resolvers = {
       return author.save()
     },
     createUser: async (root, args) => {
-      const user = new User({ username: args.username })
+      const user = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre,
+      })
 
       return user.save().catch((error) => {
         throw new GraphQLError(`Creating new user failed: ${error.message}`, {
@@ -115,7 +130,16 @@ const resolvers = {
         username: user.username,
       }
 
-      return { value: jwt.sign(userToken, process.env.SECRET) }
+      return { value: jwt.sign(userToken, SECRET) }
+    },
+    _resetDatabase: async () => {
+      if (process.env.NODE_ENV !== "test") {
+        throw new GraphQLError("_resetDatabase is only available in test mode")
+      }
+      await Author.deleteMany({})
+      await Book.deleteMany({})
+      await User.deleteMany({})
+      return true
     },
   },
 }

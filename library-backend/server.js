@@ -7,7 +7,7 @@ const typeDefs = require("./schema")
 const User = require("./models/user")
 
 const getUserFromAuthHeader = async (auth) => {
-  if (!auth || !auth.startsWith("Bearer")) {
+  if (!auth || !auth.startsWith("Bearer ")) {
     return null
   }
   const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET)
