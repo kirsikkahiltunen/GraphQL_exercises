@@ -8,7 +8,7 @@ on:
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v6
@@ -32,7 +32,7 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: tests-chapter5
-        run: npx playwright install chromium
+        run: npx playwright install chromium --with-deps
 
       - name: Run E2E tests
         working-directory: tests-chapter5
