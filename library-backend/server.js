@@ -10,7 +10,7 @@ const getUserFromAuthHeader = async (auth) => {
   if (!auth || !auth.startsWith("Bearer ")) {
     return null
   }
-  const decodedToken = jwt.verify(auth.substring(7), process.env.SECRET)
+  const decodedToken = jwt.verify(auth.substring(7), process.env.JWT_SECRET)
   return User.findById(decodedToken.id)
 }
 const startServer = (port) => {

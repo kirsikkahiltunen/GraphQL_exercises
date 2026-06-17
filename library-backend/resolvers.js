@@ -1,6 +1,6 @@
 require("dotenv").config()
 const { GraphQLError } = require("graphql/error")
-const SECRET = process.env.SECRET || "test_secret"
+const SECRET = process.env.JWT_SECRET || "test_secret"
 const jwt = require("jsonwebtoken")
 const Book = require("./models/book")
 const Author = require("./models/author")
